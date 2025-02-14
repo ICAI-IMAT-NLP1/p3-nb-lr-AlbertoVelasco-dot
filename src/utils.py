@@ -90,6 +90,16 @@ def evaluate_classification(predictions: torch.Tensor, labels: torch.Tensor) -> 
     Returns:
         dict: A dictionary containing the calculated metrics.
     """
-    metrics: Dict[str, float] = None
+    tp = torch.sum((predictions == 1) & (labels == 1)).item()
+    tn = torch.sum((predictions == 0) & (labels == 0)).item()
+    fp = torch.sum((predictions == 1) & (labels == 0)).item()
+    fn = torch.sum((predictions == 0) & (labels == 1)).item()
+    
+    metrics: Dict[str, float] = {
+        "accuracy": (tp + tn) / (tp + tn + fp + fn),
+        "precision": tp / (tp + fp),
+        "recall": tp / (tp + fn),
+    }
+    metrics["f1_score"] = 2 * (metrics["precision"] * metrics["recall"]) / (metrics["precision"] + metrics["recall"])
 
     return metrics
